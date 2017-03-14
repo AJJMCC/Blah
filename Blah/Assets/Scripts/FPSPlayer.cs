@@ -31,6 +31,8 @@ public class FPSPlayer : MonoBehaviour {
     float mouseYRotation = 0f;
     public bool invertMouseY = false;
 
+    public bool cameracontrol = true;
+
     // Size variables
     public float colliderHeight = 1.8f;
     public float colliderRadius = 0.35f;
@@ -70,11 +72,12 @@ public class FPSPlayer : MonoBehaviour {
         MouseInput();
         CameraUpdate();
         Movement();
-	}
-
-    void Update () {
         mouseInputX += Input.GetAxis("Mouse X");
         mouseInputY += Input.GetAxis("Mouse Y");
+    }
+
+    void Update () {
+     
     }
 
     void MouseInput () {
@@ -101,23 +104,27 @@ public class FPSPlayer : MonoBehaviour {
         }
 
         mouseX *= (1 / Time.fixedDeltaTime) / 60;
-        mouseY *= (1 / Time.fixedDeltaTime) / 60;
+        mouseY *= (1 / Time.deltaTime) / 60;
 
         mouseInputX = 0;
         mouseInputY = 0;
     }
 
     void CameraUpdate () {
-        if (invertMouseY)
-            mouseY = -mouseY;
-        myTransform.Rotate(myTransform.up * mouseX);
-        mouseYRotation = Mathf.Clamp(mouseYRotation + mouseY, cameraMinAngle, cameraMaxAngle);
-        firstPersonCameraTransform.localRotation = Quaternion.Euler((Vector3.left * mouseYRotation) + (Vector3.forward * mouseX * cameraTilt) + (Vector3.forward * -Input.GetAxis("Horizontal") * 3 * cameraTilt));
+        if (cameracontrol)
+        {
+            if (invertMouseY)
+                mouseY = -mouseY;
+            myTransform.Rotate(myTransform.up * mouseX);
+            mouseYRotation = Mathf.Clamp(mouseYRotation + mouseY, cameraMinAngle, cameraMaxAngle);
+            firstPersonCameraTransform.localRotation = Quaternion.Euler((Vector3.left * mouseYRotation) + (Vector3.forward * mouseX * cameraTilt) + (Vector3.forward * -Input.GetAxis("Horizontal") * 3 * cameraTilt));
+        }
+        
     }
 
     void Movement () {
         myRigidbody.velocity += myTransform.forward * forwardsSpeed * Input.GetAxis("Vertical") * ((1 / Time.fixedDeltaTime) / 60);
         myRigidbody.velocity += myTransform.right * forwardsSpeed * Input.GetAxis("Horizontal") * sidewaysSpeedMultiplier * ((1 / Time.fixedDeltaTime) / 60);
-        Debug.Log(myRigidbody.velocity);
+       // Debug.Log(myRigidbody.velocity);
     }
 }
